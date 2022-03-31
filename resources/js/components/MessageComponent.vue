@@ -27,28 +27,28 @@
             <!-- Options Ends -->
         </div>
         <div class="card-body" v-chat-scroll>
-                <p class="card-text" v-for="chat in chats" :key="chat.message">
-                    {{chat.message}}
-                </p>
+            <p class="card-text" v-for="chat in chats" :key="chat.message">
+                {{ chat.message }}
+            </p>
         </div>
         <form class="card-footer" @submit.prevent="send">
-                <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Write your message here" :disabled="session_block">
-                </div>
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="Write your message here" :disabled="session_block">
+            </div>
         </form>
     </div>
 </template>
 
 <script>
-    export default {
-        data() {
-            return {
-                chats: [],
-                session_block: false
-            }
-        },
-        created() {
-            this.chats.push({
+export default {
+    data() {
+        return {
+            chats: [],
+            session_block: false
+        }
+    },
+    created() {
+        this.chats.push({
                 message: 'Heyyyyyyy',
             },
             {
@@ -78,37 +78,36 @@
             {
                 message: 'How are yotfu'
             })
+    },
+    mounted() {
+        console.log('MessageComponent mounted.')
+    },
+    methods: {
+        send() {
+            console.log('yeah');
         },
-        mounted() {
-            console.log('MessageComponent mounted.')
+        close() {
+            this.$emit('close')
         },
-        methods: {
-            send() {
-                console.log('yeah');
-            },
-            close() {
-                this.$emit('close')
-            },
-            block() {
-               this.session_block = true;
-            },
-            unblock() {
-                this.session_block = false;
-            }
+        block() {
+            this.session_block = true;
+        },
+        unblock() {
+            this.session_block = false;
         }
     }
+}
 </script>
 <style scoped>
 .chat-box {
     height: 400px;
 }
+
 .card-body {
     overflow-y: scroll;
 }
-.float-right {
-    float: right;
-}
+
 .mr-4 {
-    margin-right: 4px;
+    margin-right: 10px;
 }
 </style>
