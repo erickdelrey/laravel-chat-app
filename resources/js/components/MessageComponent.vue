@@ -1,7 +1,10 @@
 <template>
     <div class="card chat-box">
         <div class="card-header">
-            Chats
+            <b :class="{'text-danger':session_block}">
+                User Name
+                <span v-if="session_block">(Blocked)</span>
+            </b>
 
             <!-- Close Button -->
             <a href="" @click.prevent="close">
@@ -10,17 +13,17 @@
             <!-- Close Button Ends -->
 
             <!-- Options -->
-            <div class="dropdown">
-                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    Dropdown button
-                </button>
-                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="#">Action</a>
-                    <a class="dropdown-item" href="#">Another action</a>
-                    <a class="dropdown-item" href="#">Something else here</a>
-                </div>
+            <div class="dropdown float-end">
+                <a href="" type="button" id="dropdownMenuButton1"
+                   data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fa fa-ellipsis-v mr-4" aria-hidden="true"></i>
+                </a>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li v-if="session_block"><a class="dropdown-item" href="#" @click.prevent="unblock">Unblock</a></li>
+                    <li v-else><a class="dropdown-item" href="#" @click.prevent="block">Block</a></li>
+                    <li><a class="dropdown-item" href="#">Clear Chat</a></li>
+                </ul>
             </div>
-            <i class="fa fa-ellipsis-v float-right mr-4" aria-hidden="true"></i>
             <!-- Options Ends -->
         </div>
         <div class="card-body" v-chat-scroll>
@@ -30,7 +33,7 @@
         </div>
         <form class="card-footer" @submit.prevent="send">
                 <div class="form-group">
-                    <input type="text" class="form-control" placeholder="Write your message here">
+                    <input type="text" class="form-control" placeholder="Write your message here" :disabled="session_block">
                 </div>
         </form>
     </div>
@@ -40,7 +43,8 @@
     export default {
         data() {
             return {
-                chats: []
+                chats: [],
+                session_block: false
             }
         },
         created() {
@@ -84,6 +88,12 @@
             },
             close() {
                 this.$emit('close')
+            },
+            block() {
+               this.session_block = true;
+            },
+            unblock() {
+                this.session_block = false;
             }
         }
     }
