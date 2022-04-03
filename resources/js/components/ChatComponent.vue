@@ -51,16 +51,22 @@ export default {
             axios.get('/getFriends').then(res => this.friends = res.data.data);
         },
         openChat(friend) {
-            console.log(friend);
             if(friend.session) {
                 this.friends.forEach(friend => {
                    friend.session.open = false;
                 });
                 friend.session.open = true;
-                console.log("Here");
             } else {
-
+                this.createSession(friend);
             }
+        },
+        createSession(friend) {
+            axios
+                .post('/session/create', {friend_id: friend.id})
+                .then(res => {
+                    (friend.session = res.data.data),
+                        (friend.session.open = true);
+                });
         }
     },
     created() {

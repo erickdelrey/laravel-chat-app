@@ -18,6 +18,7 @@ Route::get('/', function () {
 });
 
 Route::get('/getFriends', 'App\Http\Controllers\HomeController@getFriends');
+Route::post('/session/create', 'App\Http\Controllers\SessionController@create');
 
 Auth::routes();
 
