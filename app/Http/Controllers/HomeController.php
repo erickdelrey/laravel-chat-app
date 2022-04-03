@@ -28,4 +28,8 @@ class HomeController extends Controller
         //return UserResource::collection(User::all());
         return view('home');
     }
+
+    public function getFriends() {
+        return User::all();
+    }
 }
