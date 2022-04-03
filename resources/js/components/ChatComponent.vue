@@ -5,50 +5,68 @@
                 <div class="card">
                     <div class="card-header">Private Chat App</div>
                     <ul class="list-group">
-                        <a href="" @click.prevent>
-                            <li class="list-group-item"
-                                :key="friend.id"
-                                v-for="friend in friends">
-                                <a href="" @click.prevent>
-                                {{friend.name}}
-                                </a>
+                        <a href=""
+                           @click.prevent="openChat(friend)"
+                           :key="friend.id"
+                           v-for="friend in friends">
+                            <li class="list-group-item">
+                                {{ friend.name }}
                             </li>
-
+                        </a>
                     </ul>
                 </div>
             </div>
             <div class="col-md-9">
-                <message-component v-if="open" @close="close"></message-component>
+                <span v-for="friend in friends" :key="friend.id" v-if="friend.session">
+                    <message-component
+                        v-if="friend.session.open"
+                        @close="close(friend)"
+                        :friend="friend"
+                    ></message-component>
+                </span>
             </div>
         </div>
     </div>
 </template>
 
 <script>
-    import MessageComponent from './MessageComponent';
-    export default {
-        components: {MessageComponent},
-        mounted() {
-            console.log('Component mounted.')
-        },
-        data() {
-            return {
-                open: true,
-                friends: []
-            }
-        },
-        methods: {
-            close() {
-                this.open = false;
-            },
-            getFriends() {
-                axios.post('/getFriends').then(res => console.log(res.data));
-            }
-        },
-        created() {
-            this.getFriends();
+import MessageComponent from './MessageComponent';
+
+export default {
+    components: {MessageComponent},
+    mounted() {
+        console.log('Component mounted.')
+    },
+    data() {
+        return {
+            open: true,
+            friends: []
         }
+    },
+    methods: {
+        close(friend) {
+            friend.session.open=false;
+        },
+        getFriends() {
+            axios.get('/getFriends').then(res => this.friends = res.data.data);
+        },
+        openChat(friend) {
+            console.log(friend);
+            if(friend.session) {
+                this.friends.forEach(friend => {
+                   friend.session.open = false;
+                });
+                friend.session.open = true;
+                console.log("Here");
+            } else {
+
+            }
+        }
+    },
+    created() {
+        this.getFriends();
     }
+}
 
 </script>
 <style scoped>

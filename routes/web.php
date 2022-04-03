@@ -17,7 +17,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::post('getFriends', 'HomeController@getFriends');
+Route::get('/getFriends', 'App\Http\Controllers\HomeController@getFriends');
 
 Auth::routes();
 
