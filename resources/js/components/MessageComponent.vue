@@ -27,7 +27,7 @@
             <!-- Options Ends -->
         </div>
         <div class="card-body" v-chat-scroll>
-            <p class="card-text" v-for="chat in chats" :key="chat.message">
+            <p class="card-text" v-for="chat in chats" :key="chat.id" :class="{'text-end':chat.type==0}">
                 {{ chat.message }}
             </p>
         </div>
@@ -51,36 +51,15 @@ export default {
         }
     },
     created() {
-        this.chats.push({
-                message: 'Heyyyyyyy',
-            },
-            {
-                message: 'How are you'
-            },
-            {
-                message: 'Heyy',
-            },
-            {
-                message: 'How are yofdu'
-            },
-            {
-                message: 'Heyyyy',
-            },
-            {
-                message: 'How are you!'
-            },
-            {
-                message: 'Heyyyyyyy4',
-            },
-            {
-                message: 'How are yoyu'
-            },
-            {
-                message: 'Heyyyyyd',
-            },
-            {
-                message: 'How are yotfu'
-            })
+        this.getAllMessages();
+
+        Echo.private(`Chat.${this.friend.session.id}`).listen('PrivateChatEvent', (e) => {
+            this.chats.push({
+                message: e.content,
+                type: 1,
+                sent_at: 'Just now'
+            });
+        });
     },
     mounted() {
         console.log('MessageComponent mounted.')
@@ -99,7 +78,11 @@ export default {
             }
         },
         pushToChats(message) {
-            this.chats.push({message: message});
+            this.chats.push({
+                message: message,
+                type: 0,
+                sent_at: 'Just now'
+            });
         },
         close() {
             this.$emit('close')
@@ -109,6 +92,10 @@ export default {
         },
         unblock() {
             this.session_block = false;
+        },
+        getAllMessages() {
+            axios.get(`/session/${this.friend.session.id}/chats`)
+                .then(res => (this.chats = res.data.data));
         }
     }
 }

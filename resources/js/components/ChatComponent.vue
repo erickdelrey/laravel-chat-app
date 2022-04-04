@@ -34,7 +34,7 @@ import MessageComponent from './MessageComponent';
 export default {
     components: {MessageComponent},
     mounted() {
-        console.log('Component mounted.')
+        console.log('ChatComponent mounted.')
     },
     data() {
         return {
@@ -50,18 +50,14 @@ export default {
             axios.get('/getFriends').then(res => this.friends = res.data.data);
         },
         openChat(friend) {
-            console.log("here");
             if (friend.session) {
                 this.friends.forEach(friend => {
-                    if (friend.session) {
-                        friend.session.open = false;
-                    }
+                    friend.session ? friend.session.open = false : ''
                 });
                 friend.session.open = true;
             } else {
                 this.createSession(friend);
             }
-            console.log("here1");
         },
         createSession(friend) {
             axios
@@ -76,8 +72,8 @@ export default {
         this.getFriends();
 
         Echo.channel('Chat').listen('SessionEvent', e => {
-          let friend = this.friends.find(friend => friend.id == e.session_by);
-          friend.session = e.session;
+            let friend = this.friends.find(friend => friend.id == e.session_by);
+            friend.session = e.session;
         });
 
         Echo.join('Chat')
@@ -90,12 +86,16 @@ export default {
                     });
                 });
             })
-        .joining((user) => {
-            this.friends.forEach(friend => {user.id == friend.id ? friend.online = true: ''});
-        })
-        .leaving((user) => {
-            this.friends.forEach(friend => {user.id == friend.id ? friend.online = false: ''});
-        });
+            .joining((user) => {
+                this.friends.forEach(friend => {
+                    user.id == friend.id ? friend.online = true : ''
+                });
+            })
+            .leaving((user) => {
+                this.friends.forEach(friend => {
+                    user.id == friend.id ? friend.online = false : ''
+                });
+            });
     }
 }
 
