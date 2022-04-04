@@ -5,14 +5,13 @@
                 <div class="card">
                     <div class="card-header">Private Chat App</div>
                     <ul class="list-group">
-                        <a href=""
-                           @click.prevent="openChat(friend)"
-                           :key="friend.id"
-                           v-for="friend in friends">
-                            <li class="list-group-item">
-                                {{ friend.name }}
-                            </li>
-                        </a>
+                        <li class="list-group-item"
+                            @click.prevent="openChat(friend)"
+                            :key="friend.id"
+                            v-for="friend in friends">
+                            <a href="">{{ friend.name }}</a>
+                            <i class="fa fa-circle float-end text-success" v-if="friend.online" aria-hidden="true"></i>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -45,20 +44,24 @@ export default {
     },
     methods: {
         close(friend) {
-            friend.session.open=false;
+            friend.session.open = false;
         },
         getFriends() {
             axios.get('/getFriends').then(res => this.friends = res.data.data);
         },
         openChat(friend) {
-            if(friend.session) {
+            console.log("here");
+            if (friend.session) {
                 this.friends.forEach(friend => {
-                   friend.session.open = false;
+                    if (friend.session) {
+                        friend.session.open = false;
+                    }
                 });
                 friend.session.open = true;
             } else {
                 this.createSession(friend);
             }
+            console.log("here1");
         },
         createSession(friend) {
             axios
@@ -71,6 +74,28 @@ export default {
     },
     created() {
         this.getFriends();
+
+        Echo.channel('Chat').listen('SessionEvent', e => {
+          let friend = this.friends.find(friend => friend.id == e.session_by);
+          friend.session = e.session;
+        });
+
+        Echo.join('Chat')
+            .here((users) => {
+                this.friends.forEach(friend => {
+                    users.forEach(user => {
+                        if (user.id == friend.id) {
+                            friend.online = true;
+                        }
+                    });
+                });
+            })
+        .joining((user) => {
+            this.friends.forEach(friend => {user.id == friend.id ? friend.online = true: ''});
+        })
+        .leaving((user) => {
+            this.friends.forEach(friend => {user.id == friend.id ? friend.online = false: ''});
+        });
     }
 }
 
