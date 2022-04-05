@@ -9,7 +9,12 @@
                             @click.prevent="openChat(friend)"
                             :key="friend.id"
                             v-for="friend in friends">
-                            <a href="">{{ friend.name }}</a>
+                            <a id="friendName" href="">
+                                {{ friend.name }}
+                                <span class="text-danger" v-if="friend.session && friend.session.unreadCount > 0">
+                                    {{ friend.session.unreadCount }}
+                                </span>
+                            </a>
                             <i class="fa fa-circle float-end text-success" v-if="friend.online" aria-hidden="true"></i>
                         </li>
                     </ul>
@@ -47,7 +52,12 @@ export default {
             friend.session.open = false;
         },
         getFriends() {
-            axios.get('/getFriends').then(res => this.friends = res.data.data);
+            axios.get('/getFriends').then(res => {
+                this.friends = res.data.data;
+                this.friends.forEach(
+                    friend => (friend.session ? this.listenForEverySession(friend) : "")
+                );
+            });
         },
         openChat(friend) {
             if (friend.session) {
@@ -55,6 +65,7 @@ export default {
                     friend.session ? friend.session.open = false : ''
                 });
                 friend.session.open = true;
+                friend.session.unreadCount = 0;
             } else {
                 this.createSession(friend);
             }
@@ -66,6 +77,11 @@ export default {
                     (friend.session = res.data.data),
                         (friend.session.open = true);
                 });
+        },
+        listenForEverySession(friend) {
+            Echo.private(`Chat.${friend.session.id}`)
+                .listen('PrivateChatEvent',
+                    (e) => (friend.session.open ? "" : friend.session.unreadCount++));
         }
     },
     created() {
@@ -74,6 +90,7 @@ export default {
         Echo.channel('Chat').listen('SessionEvent', e => {
             let friend = this.friends.find(friend => friend.id == e.session_by);
             friend.session = e.session;
+            this.listenForEverySession(friend);
         });
 
         Echo.join('Chat')
@@ -104,5 +121,9 @@ export default {
 .list-group-item {
     border: none;
     border-bottom: 1px solid lightgray;
+}
+
+#friendName {
+    text-decoration: none;
 }
 </style>
