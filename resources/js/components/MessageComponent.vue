@@ -21,14 +21,17 @@
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
                     <li v-if="session_block"><a class="dropdown-item" href="#" @click.prevent="unblock">Unblock</a></li>
                     <li v-else><a class="dropdown-item" href="#" @click.prevent="block">Block</a></li>
-                    <li><a class="dropdown-item" href="#">Clear Chat</a></li>
+                    <li><a class="dropdown-item" href="#" @click.prevent="clear">Clear Chat</a></li>
                 </ul>
             </div>
             <!-- Options Ends -->
         </div>
         <div class="card-body" v-chat-scroll>
-            <p class="card-text" v-for="chat in chats" :key="chat.id" :class="{'text-end':chat.type==0}">
+            <p class="card-text" v-for="chat in chats" :key="chat.id" :class="{'text-end':chat.type==0,
+            'text-success': chat.read_at != null}">
                 {{ chat.message }}
+                <br>
+                <span style="font-size:8px">{{ chat.read_at }}</span>
             </p>
         </div>
         <form class="card-footer" @submit.prevent="send">
@@ -56,13 +59,17 @@ export default {
         this.getAllMessages();
 
         Echo.private(`Chat.${this.friend.session.id}`).listen('PrivateChatEvent', (e) => {
-            this.read();
+            this.friend.session.open ? this.read() : "";
             this.chats.push({
                 message: e.content,
                 type: 1,
                 sent_at: 'Just now'
             });
         });
+
+        Echo.private(`Chat.${this.friend.session.id}`).listen('MsgReadEvent',
+            e => this.chats.forEach(chat => chat.id == e.chat.id ? (chat.read_at = e.chat.read_at) : "")
+        );
     },
     mounted() {
         console.log('MessageComponent mounted.')
@@ -77,6 +84,7 @@ export default {
                     to_user: this.friend.id
                 }
                 axios.post(`/session/${this.friend.session.id}/send`, requestBody)
+                    .then(res => this.chats[this.chats.length - 1].id = res.data);
                 this.message = null;
             }
         },
@@ -84,11 +92,16 @@ export default {
             this.chats.push({
                 message: message,
                 type: 0,
+                read_at: null,
                 sent_at: 'Just now'
             });
         },
         close() {
             this.$emit('close')
+        },
+        clear() {
+            axios.post(`session/${this.friend.session.id}/clear`)
+                .then(res => this.chats = []);
         },
         block() {
             this.session_block = true;

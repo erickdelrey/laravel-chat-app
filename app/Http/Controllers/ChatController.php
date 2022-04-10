@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Events\PrivateChatEvent;
+use App\Events\MsgReadEvent;
 use App\Http\Resources\ChatResource;
 use Illuminate\Http\Request;
 use App\Models\Session;
@@ -22,7 +23,7 @@ class ChatController extends Controller
 
         broadcast(new PrivateChatEvent($requestContent['message'], $chat));
 
-        return response($message, 202);
+        return response($chat->id, 202);
     }
 
     public function chats(Session $session)
@@ -36,6 +37,14 @@ class ChatController extends Controller
 
         foreach ($chats as $chat) {
             $chat->update(['read_at' => Carbon::now()]);
+            broadcast(new MsgReadEvent(new ChatResource($chat), $chat->session_id));
         }
+    }
+
+    public function clear(Session $session)
+    {
+        $session->deleteChats();
+        $session->chats->count() == 0 ? $session->deleteMessages() : '';
+        return response('cleared', 200);
     }
 }

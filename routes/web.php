@@ -22,6 +22,7 @@ Route::post('/session/create', 'App\Http\Controllers\SessionController@create');
 Route::post('/session/{session}/send', 'App\Http\Controllers\ChatController@send');
 Route::get('/session/{session}/chats', 'App\Http\Controllers\ChatController@chats');
 Route::post('/session/{session}/read', 'App\Http\Controllers\ChatController@read');
+Route::post('/session/{session}/clear', 'App\Http\Controllers\ChatController@clear');
 
 Auth::routes();
 
