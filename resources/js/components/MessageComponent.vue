@@ -2,7 +2,7 @@
     <div class="card chat-box">
         <div class="card-header">
             <b :class="{'text-danger':session.isBlocked}">
-                {{ friend.name }}
+                {{ friend.name }} <span v-if="isTyping">is typing . . .</span>
                 <span v-if="session.isBlocked">(Blocked)</span>
             </b>
 
@@ -49,7 +49,8 @@ export default {
     data() {
         return {
             chats: [],
-            message: null
+            message: null,
+            isTyping: false
         }
     },
     computed: {
@@ -57,7 +58,17 @@ export default {
             return this.friend.session;
         },
         canUnblock() {
-            return this.session.blockedBy == authId;
+            return this.session.blockedBy == auth.id;
+        }
+    },
+    watch: {
+        message(value) {
+            if (value) {
+                Echo.private(`Chat.${this.friend.session.id}`)
+                    .whisper('typing', {
+                        name: auth.name
+                    });
+            }
         }
     },
     created() {
@@ -81,6 +92,15 @@ export default {
         Echo.private(`Chat.${this.friend.session.id}`).listen('BlockEvent',
             e => (this.session.isBlocked = e.isBlocked)
         );
+
+        Echo.private(`Chat.${this.friend.session.id}`).listenForWhisper('typing',
+            e => {
+                this.isTyping = true;
+                setTimeout(() => {
+                    this.isTyping = false;
+                }, 1000);
+            }
+        );
     },
     mounted() {
         console.log('MessageComponent mounted.')
@@ -88,7 +108,7 @@ export default {
     methods: {
         send() {
             let $message = this.message;
-            if ($message) {
+            if ($message && !this.friend.session.isBlocked) {
                 this.pushToChats($message)
                 let requestBody = {
                     message: $message,
@@ -117,7 +137,7 @@ export default {
         block() {
             this.friend.session.isBlocked = true;
             axios.post(`session/${this.friend.session.id}/block`)
-                .then(res => this.session.blockedBy = authId);
+                .then(res => this.session.blockedBy = auth.id);
         },
         unblock() {
             this.friend.session.isBlocked = false;

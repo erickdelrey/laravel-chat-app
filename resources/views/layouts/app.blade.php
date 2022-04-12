@@ -13,7 +13,7 @@
     <script src="{{ asset('js/app.js') }}" defer></script>
 
     <script>
-        window.authId = {!!auth()->id()!!}
+        window.auth = {!!auth()->user()!!}
     </script>
 
     <!-- Fonts -->
