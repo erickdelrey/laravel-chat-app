@@ -67,6 +67,9 @@ export default {
                 friend.session.open = true;
                 friend.session.unreadCount = 0;
             } else {
+                this.friends.forEach(friend => {
+                    friend.session ? friend.session.open = false : ''
+                });
                 this.createSession(friend);
             }
         },
@@ -74,8 +77,7 @@ export default {
             axios
                 .post('/session/create', {friend_id: friend.id})
                 .then(res => {
-                    (friend.session = res.data.data),
-                        (friend.session.open = true);
+                    (friend.session = res.data.data), (friend.session.open = true);
                 });
         },
         listenForEverySession(friend) {

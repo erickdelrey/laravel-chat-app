@@ -18,6 +18,8 @@ return new class extends Migration
             $table->unsignedInteger('user1_id');
             $table->unsignedInteger('user2_id');
             $table->unique(['user1_id', 'user2_id']);
+            $table->boolean('is_blocked')->default(false);
+            $table->unsignedInteger('blocked_by')->nullable();
             $table->timestamps();
         });
     }
