@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('content');
             $table->unsignedInteger('session_id');
             $table->timestamps();
+            $table->index('session_id');
         });
     }
 

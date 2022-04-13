@@ -1,4 +1,3 @@
-
 <template>
     <div class="card chat-box">
         <div class="card-header">
@@ -20,8 +19,10 @@
                     <i class="fa fa-ellipsis-v mr-4" aria-hidden="true"></i>
                 </a>
                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                    <li v-if="session.isBlocked && canUnblock"><a class="dropdown-item" href="#" @click.prevent="unblock">Unblock</a></li>
-                    <li v-if="!session.isBlocked"><a class="dropdown-item" href="#" @click.prevent="block">Block</a></li>
+                    <li v-if="session.isBlocked && canUnblock"><a class="dropdown-item" href="#"
+                                                                  @click.prevent="unblock">Unblock</a></li>
+                    <li v-if="!session.isBlocked"><a class="dropdown-item" href="#" @click.prevent="block">Block</a>
+                    </li>
                     <li><a class="dropdown-item" href="#" @click.prevent="clear">Clear Chat</a></li>
                 </ul>
             </div>
@@ -35,28 +36,46 @@
                 <span style="font-size:8px">{{ chat.read_at }}</span>
             </p>
         </div>
-        <form class="card-footer" @submit.prevent="send">
+        <div class="card-footer">
             <div class="form-group">
-                <input type="text" class="form-control" v-model="message" placeholder="Write your message here"
-                       :disabled="session.isBlocked">
-                <picker title="Pick your emoji…" emoji="point_up" @select="onInput"/>
+                <emoji
+                    set="twitter"
+                    :emoji="{ id: randomEmoji }"
+                    :size="22"
+                    @click="showPicker = !showPicker"
+                    class="icons"
+                    :style="{ position: 'absolute', right: '10px' }"
+                />
+                <picker
+                    @select="pushEmoji"
+                    set="twitter"
+                    :style="{ position: 'absolute', right: '10px' }"
+                    v-show="showPicker"
+                />
+                <form @submit.prevent="send">
+                    <input type="text" class="form-control" id="inputMessage" v-model="message" placeholder="Write your message here"
+                           :disabled="session.isBlocked">
+                </form>
             </div>
-        </form>
+        </div>
     </div>
 </template>
 
 <script>
-import { Picker } from 'emoji-mart-vue'
+import {Emoji, Picker} from 'emoji-mart-vue'
+
 export default {
     props: ['friend'],
     components: {
-        Picker
+        Picker, Emoji
     },
     data() {
         return {
             chats: [],
-            message: null,
-            isTyping: false
+            message: "",
+            isTyping: false,
+            showPicker: false,
+            randomEmoji: "grinning",
         }
     },
     computed: {
@@ -113,6 +132,7 @@ export default {
     },
     methods: {
         send() {
+            this.showPicker = false;
             let $message = this.message;
             if ($message && !this.friend.session.isBlocked) {
                 this.pushToChats($message)
@@ -156,6 +176,11 @@ export default {
         },
         read() {
             axios.post(`/session/${this.friend.session.id}/read`)
+        },
+        pushEmoji(emoji) {
+            this.message = this.message == null ? "" : this.message;
+            this.message += emoji.native;
+            this.showPicker = !this.showPicker;
         }
     }
 }
@@ -171,5 +196,8 @@ export default {
 
 .mr-4 {
     margin-right: 10px;
+}
+#inputMessage {
+    width: 95%;
 }
 </style>

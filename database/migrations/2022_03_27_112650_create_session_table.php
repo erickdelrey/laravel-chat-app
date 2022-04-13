@@ -21,6 +21,8 @@ return new class extends Migration
             $table->boolean('is_blocked')->default(false);
             $table->unsignedInteger('blocked_by')->nullable();
             $table->timestamps();
+            $table->index('user1_id');
+            $table->index('user2_id');
         });
     }
 

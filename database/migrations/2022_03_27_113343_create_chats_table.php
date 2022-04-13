@@ -21,6 +21,8 @@ return new class extends Migration
             $table->dateTime('read_at')->nullable();
             $table->boolean('type'); //0 is for send and 1 is for receive
             $table->timestamps();
+            $table->index('user_id');
+            $table->index('session_id');
         });
     }
 
