@@ -28,7 +28,7 @@
             </div>
             <!-- Options Ends -->
         </div>
-        <div class="card-body" v-chat-scroll>
+        <div class="card-body" v-chat-scroll @click="showPicker = false">
             <p class="card-text" v-for="chat in chats" :key="chat.id" :class="{'text-end':chat.type==0,
             'text-success': chat.read_at != null}">
                 {{ chat.message }}
@@ -43,14 +43,14 @@
                     :emoji="{ id: randomEmoji }"
                     :size="22"
                     @click="showPicker = !showPicker"
-                    class="icons"
-                    :style="{ position: 'absolute', right: '10px' }"
+                    class="icons emoji"
                 />
                 <picker
                     @select="pushEmoji"
                     set="twitter"
-                    :style="{ position: 'absolute', right: '10px' }"
+                    class="emoji"
                     v-show="showPicker"
+                    @click="showPicker = false"
                 />
                 <form @submit.prevent="send">
                     <input type="text" class="form-control" id="inputMessage" v-model="message" placeholder="Write your message here"
@@ -199,5 +199,10 @@ export default {
 }
 #inputMessage {
     width: 95%;
+}
+.emoji {
+    position: absolute !important;
+    right: 10px;
+    padding-top: 10px;
 }
 </style>

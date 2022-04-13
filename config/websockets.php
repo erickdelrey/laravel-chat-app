@@ -28,7 +28,7 @@ return [
             'key' => "d7048b86301cbed05b99",
             'secret' => "4e7934f5c8143bc47084",
             'path' => "ap1",
-            'enable_client_messages' => false,
+            'enable_client_messages' => true,
             'enable_statistics' => true,
             'useTLS' => false,
         ],
