@@ -1,3 +1,4 @@
+
 <template>
     <div class="card chat-box">
         <div class="card-header">
@@ -38,14 +39,19 @@
             <div class="form-group">
                 <input type="text" class="form-control" v-model="message" placeholder="Write your message here"
                        :disabled="session.isBlocked">
+                <picker title="Pick your emoji…" emoji="point_up" @select="onInput"/>
             </div>
         </form>
     </div>
 </template>
 
 <script>
+import { Picker } from 'emoji-mart-vue'
 export default {
     props: ['friend'],
+    components: {
+        Picker
+    },
     data() {
         return {
             chats: [],

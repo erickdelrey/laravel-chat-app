@@ -28,5 +28,9 @@ window.Echo = new Echo({
     broadcaster: 'pusher',
     key: 'd7048b86301cbed05b99',
     cluster: 'ap1',
-    forceTLS: true
+    encrypted: false,
+    wsHost: window.location.hostname,
+    wsPort: 6001,
+    disableStats: true,
+    forceTLS: false,
 });

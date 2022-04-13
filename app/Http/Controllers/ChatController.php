@@ -15,7 +15,7 @@ class ChatController extends Controller
     {
         $requestContent = json_decode($request->getContent(), true);
 
-        $message = $session->messages()->create(['content' => $requestContent['message']]);
+        $message = $session->messages()->create(['content' => $this->encryptText($requestContent['message'])]);
 
         $chat = $message->createForSend($session->id);
 
@@ -24,6 +24,18 @@ class ChatController extends Controller
         broadcast(new PrivateChatEvent($requestContent['message'], $chat));
 
         return response($chat->id, 202);
+    }
+
+    private function encryptText($plaintext, $secret_key = "5fgf5HJ5g27", $cipher = "AES-128-CBC")
+    {
+
+        $key = openssl_digest($secret_key, 'SHA256', TRUE);
+
+        $ivlen = openssl_cipher_iv_length($cipher);
+        $iv = openssl_random_pseudo_bytes($ivlen);
+        $ciphertext_raw = openssl_encrypt($plaintext, $cipher, $key, OPENSSL_RAW_DATA, $iv);
+        $hmac = hash_hmac('sha256', $ciphertext_raw, $key, true);
+        return base64_encode($iv . $hmac . $ciphertext_raw);
     }
 
     public function chats(Session $session)
