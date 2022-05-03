@@ -29,7 +29,7 @@ window.Echo = new Echo({
     key: 'd7048b86301cbed05b99',
     cluster: 'ap1',
     encrypted: true,
-    wsHost: window.location.host,
+    wsHost: 'chat.erickdelrey.rocks',
     wsPort: 6001,
     wssPort: 6001,
     disableStats: true
