@@ -28,11 +28,10 @@ window.Echo = new Echo({
     broadcaster: 'pusher',
     key: 'd7048b86301cbed05b99',
     cluster: 'ap1',
-    encrypted: false,
-    wsHost: 'chat.erickdelrey.rocks',
+    encrypted: true,
+    wsHost: window.location.hostname,
     wsPort: 6001,
     wssPort: 6001,
     disableStats: true,
-    forceTLS: true,
     enabledTransports: ['ws', 'wss']
 });
