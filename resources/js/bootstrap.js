@@ -32,6 +32,5 @@ window.Echo = new Echo({
     wsHost: 'chat.erickdelrey.rocks',
     wsPort: 6001,
     wssPort: 6001,
-    disableStats: true,
-    enabledTransports: ['ws', 'wss']
+    disableStats: true
 });
