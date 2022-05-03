@@ -28,8 +28,7 @@ return [
             'key' => "d7048b86301cbed05b99",
             'secret' => "4e7934f5c8143bc47084",
             'enable_client_messages' => true,
-            'enable_statistics' => true,
-            'useTLS' => false
+            'enable_statistics' => true
         ],
     ],
 
@@ -109,6 +108,7 @@ return [
      * You can see all available options at: http://php.net/manual/en/context.ssl.php
      */
     'ssl' => [
+        'verify_peer' => false,
         /*
          * Path to local certificate file on filesystem. It must be a PEM encoded file which
          * contains your certificate and private key. It can optionally contain the
