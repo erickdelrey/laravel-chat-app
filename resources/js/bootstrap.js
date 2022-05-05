@@ -26,10 +26,11 @@ window.Pusher = require('pusher-js');
 
 window.Echo = new Echo({
     broadcaster: 'pusher',
-    key: 'd7048b86301cbed05b99',
-    cluster: 'ap1',
+    key: 'app_key',
+    cluster: 'mt1',
     encrypted: true,
-    wsHost: 'chat.erickdelrey.rocks',
+    forceTLS: true,
+    wsHost: 'websockets.erickdelrey.rocks',
     wsPort: 6001,
     wssPort: 6001,
     disableStats: true
